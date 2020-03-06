@@ -7,7 +7,9 @@ layout: Doc
 -->
 
 <!-- DOCS-SITE-LINK:START automatically generated  -->
+
 ### [Read this on the main serverless docs site](https://www.serverless.com/framework/docs/providers/google/cli-reference/create)
+
 <!-- DOCS-SITE-LINK:END -->
 
 # Google - Create
@@ -29,7 +31,7 @@ serverless create --template google-nodejs --path my-service
 ## Options
 
 - `--template` or `-t` The name of one of the available templates. **Required if --template-url and --template-path are not present**.
-- `--template-url` or `-u` The name of one of the available templates. **Required if --template and --template-path are not present**.
+- `--template-url` or `-u` A URL pointing to a remotely hosted template. **Required if --template and --template-path are not present**.
 - `--template-path` The local path of your template. **Required if --template and --template-url are not present**.
 - `--path` or `-p` The path where the service should be created.
 - `--name` or `-n` the name of the service in `serverless.yml`.
@@ -41,6 +43,8 @@ To see a list of available templates run `serverless create --help`
 Most commonly used templates:
 
 - google-nodejs
+- google-go
+- google-python
 
 ## Examples
 
