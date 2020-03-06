@@ -7,7 +7,9 @@ layout: Doc
 -->
 
 <!-- DOCS-SITE-LINK:START automatically generated  -->
+
 ### [Read this on the main serverless docs site](https://www.serverless.com/framework/docs/providers/spotinst/cli-reference/create)
+
 <!-- DOCS-SITE-LINK:END -->
 
 # Spotinst Functions - Create
@@ -27,8 +29,9 @@ serverless create -t spotinst-nodejs -p myService
 ```
 
 ## Options
+
 - `--template` or `-t` The name of one of the available templates. **Required if --template-url and --template-path are not present**.
-- `--template-url` or `-u` The name of one of the available templates. **Required if --template and --template-path are not present**.
+- `--template-url` or `-u` A URL pointing to a remotely hosted template. **Required if --template and --template-path are not present**.
 - `--template-path` The local path of your template. **Required if --template and --template-url are not present**.
 - `--path` or `-p` The path where the service should be created.
 - `--name` or `-n` the name of the service in `serverless.yml`.
@@ -60,7 +63,6 @@ serverless create -t spotinst-nodejs -n my-special-service
 
 This example will generate scaffolding for a service with `Spotinst` as a provider and `nodejs` as runtime. The scaffolding
 will be generated in the current working directory.
-
 
 ### Creating a named service in a (new) directory
 

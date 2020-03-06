@@ -7,12 +7,14 @@ layout: Doc
 -->
 
 <!-- DOCS-SITE-LINK:START automatically generated  -->
+
 ### [Read this on the main serverless docs site](https://www.serverless.com/framework/docs/providers/aws/guide/functions)
+
 <!-- DOCS-SITE-LINK:END -->
 
 # AWS - Functions
 
-If you are using AWS as a provider, all *functions* inside the service are AWS Lambda functions.
+If you are using AWS as a provider, all _functions_ inside the service are AWS Lambda functions.
 
 ## Configuration
 
@@ -24,10 +26,12 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
+  tracing:
+    lambda: true # optional, enables tracing for all functions (can be true (true equals 'Active') 'Active' or 'PassThrough')
 
 functions:
   hello:
@@ -37,14 +41,16 @@ functions:
     runtime: python2.7 # optional overwrite, default is provider runtime
     memorySize: 512 # optional, in MB, default is 1024
     timeout: 10 # optional, in seconds, default is 6
+    provisionedConcurrency: 3 # optional, Count of provisioned lambda instances
     reservedConcurrency: 5 # optional, reserved concurrency limit for this function. By default, AWS uses account concurrency limit
+    tracing: PassThrough # optional, overwrite, can be 'Active' or 'PassThrough'
 ```
 
 The `handler` property points to the file and module containing the code you want to run in your function.
 
 ```javascript
 // handler.js
-module.exports.functionOne = function(event, context, callback) {}
+module.exports.functionOne = function(event, context, callback) {};
 ```
 
 You can add as many functions as you want within this property.
@@ -56,7 +62,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
 
 functions:
   functionOne:
@@ -76,7 +82,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
   memorySize: 512 # will be inherited by all functions
 
 functions:
@@ -92,7 +98,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
 
 functions:
   functionOne:
@@ -104,8 +110,7 @@ You can specify an array of functions, which is useful if you separate your func
 
 ```yml
 # serverless.yml
-...
-
+---
 functions:
   - ${file(./foo-functions.yml)}
   - ${file(./bar-functions.yml)}
@@ -119,10 +124,9 @@ deleteFoo:
   handler: handler.foo
 ```
 
-
 ## Permissions
 
-Every AWS Lambda function needs permission to interact with other AWS infrastructure resources within your account.  These permissions are set via an AWS IAM Role.  You can set permission policy statements within this role via the `provider.iamRoleStatements` property.
+Every AWS Lambda function needs permission to interact with other AWS infrastructure resources within your account. These permissions are set via an AWS IAM Role. You can set permission policy statements within this role via the `provider.iamRoleStatements` property.
 
 ```yml
 # serverless.yml
@@ -130,7 +134,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -141,7 +145,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: 'arn:aws:dynamodb:us-east-1:*:*'
 
 functions:
   functionOne:
@@ -157,21 +161,21 @@ service: myService
 provider:
   name: aws
   iamRoleStatements:
-      -  Effect: "Allow"
-         Action:
-           - "s3:ListBucket"
-         # You can put CloudFormation syntax in here.  No one will judge you.
-         # Remember, this all gets translated to CloudFormation.
-         Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket"} ] ] }
-      -  Effect: "Allow"
-         Action:
-           - "s3:PutObject"
-         Resource:
-           Fn::Join:
-             - ""
-             - - "arn:aws:s3:::"
-               - "Ref" : "ServerlessDeploymentBucket"
-               - "/*"
+    - Effect: 'Allow'
+      Action:
+        - 's3:ListBucket'
+      # You can put CloudFormation syntax in here.  No one will judge you.
+      # Remember, this all gets translated to CloudFormation.
+      Resource: { 'Fn::Join': ['', ['arn:aws:s3:::', { 'Ref': 'ServerlessDeploymentBucket' }]] }
+    - Effect: 'Allow'
+      Action:
+        - 's3:PutObject'
+      Resource:
+        Fn::Join:
+          - ''
+          - - 'arn:aws:s3:::'
+            - 'Ref': 'ServerlessDeploymentBucket'
+            - '/*'
 
 functions:
   functionOne:
@@ -249,7 +253,7 @@ The Lambda function execution role must have permissions to create, describe and
 
 **VPC Lambda Internet Access**
 
-By default, when a Lambda function is executed inside a VPC, it loses internet access and some resources inside AWS may become unavailable. In order for S3 resources and DynamoDB resources to be available for your Lambda function running inside the VPC, a VPC end point needs to be created. For more information please check [VPC Endpoint for Amazon S3](https://aws.amazon.com/blogs/aws/new-vpc-endpoint-for-amazon-s3/).
+By default, when a Lambda function is executed inside a VPC, it loses internet access and some resources inside AWS may become unavailable. In order for S3 resources and [DynamoDB](https://serverless.com/dynamodb/) resources to be available for your Lambda function running inside the VPC, a VPC end point needs to be created. For more information please check [VPC Endpoint for Amazon S3](https://aws.amazon.com/blogs/aws/new-vpc-endpoint-for-amazon-s3/).
 In order for other services such as Kinesis streams to be made available, a NAT Gateway needs to be configured inside the subnets that are being used to run the Lambda, for the VPC used to execute the Lambda. For more information, please check [Enable Outgoing Internet Access within VPC](https://medium.com/@philippholly/aws-lambda-enable-outgoing-internet-access-within-vpc-8dd250e11e12)
 
 ## Environment Variables
@@ -290,6 +294,7 @@ functions:
     environment:
       TABLE_NAME: tableName2
 ```
+
 If you want your function's environment variables to have the same values from your machine's environment variables, please read the documentation about [Referencing Environment Variables](./variables.md).
 
 ## Tags
@@ -306,7 +311,7 @@ functions:
       foo: bar
 ```
 
-Or if you want to apply tags configuration to all functions in your service, you can add the configuration to the higher level `provider` object. Tags configured at the function level are merged with those at the provider level, so your function with specific tags will get the tags defined at the provider level. If a tag with the same key is defined at both the function and provider levels, the function-specific value overrides the provider-level default value. For exemple:
+Or if you want to apply tags configuration to all functions in your service, you can add the configuration to the higher level `provider` object. Tags configured at the function level are merged with those at the provider level, so your function with specific tags will get the tags defined at the provider level. If a tag with the same key is defined at both the function and provider levels, the function-specific value overrides the provider-level default value. For example:
 
 ```yml
 # serverless.yml
@@ -334,10 +339,27 @@ Real-world use cases where tagging your functions is helpful include:
 - Keeping track of legacy code (e.g. tag functions which use outdated runtimes: `runtime: nodejs0.10`)
 - ...
 
+## Layers
+
+Using the `layers` configuration makes it possible for your function to use
+[Lambda Layers](https://aws.amazon.com/blogs/aws/new-for-aws-lambda-use-any-programming-language-and-share-common-components/)
+
+```yml
+functions:
+  hello:
+    handler: handler.hello
+    layers:
+      - arn:aws:lambda:region:XXXXXX:layer:LayerName:Y
+```
+
+Layers can be used in combination with `runtime: provided` to implement your own custom runtime on
+AWS Lambda.
+
+To publish Lambda Layers, check out the [Layers](./layers.md) documentation.
+
 ## Log Group Resources
 
 By default, the framework will create LogGroups for your Lambdas. This makes it easy to clean up your log groups in the case you remove your service, and make the lambda IAM permissions much more specific and secure.
-
 
 ## Versioning Deployed Functions
 
@@ -369,12 +391,12 @@ service: service
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs12.x
 
 functions:
   hello:
     handler: handler.hello
-    onError: arn:aws:sns:us-east-1:XXXXXX:test # Ref and Fn::ImportValue are supported as well
+    onError: arn:aws:sns:us-east-1:XXXXXX:test # Ref, Fn::GetAtt and Fn::ImportValue are supported as well
 ```
 
 ### DLQ with SQS
@@ -385,7 +407,7 @@ We're working on a fix so that SQS queue arns will be supported in the future.
 
 ## KMS Keys
 
-AWS Lambda uses [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) to encrypt your environment variables at rest.
+[AWS Lambda](https://serverless.com/aws-lambda/) uses [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) to encrypt your environment variables at rest.
 
 The `awsKmsKeyArn` config variable enables you a way to define your own KMS key which should be used for encryption.
 
@@ -412,3 +434,29 @@ functions:
 ### Secrets using environment variables and KMS
 
 When storing secrets in environment variables, AWS [strongly suggests](http://docs.aws.amazon.com/lambda/latest/dg/env_variables.html#env-storing-sensitive-data) encrypting sensitive information. AWS provides a [tutorial](http://docs.aws.amazon.com/lambda/latest/dg/tutorial-env_console.html) on using KMS for this purpose.
+
+## AWS X-Ray Tracing
+
+You can enable [AWS X-Ray Tracing](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html) on your Lambda functions through the optional `tracing` config variable:
+
+```yml
+service: myService
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  tracing:
+    lambda: true
+```
+
+You can also set this variable on a per-function basis. This will override the provider level setting if present:
+
+```yml
+functions:
+  hello:
+    handler: handler.hello
+    tracing: Active
+  goodbye:
+    handler: handler.goodbye
+    tracing: PassThrough
+```

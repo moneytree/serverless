@@ -1,12 +1,14 @@
 <!--
 title: Hello World C# Example
-menuText: Hello World C# Example
+menuText: C#
 description: Create a C# Hello World Lambda function
 layout: Doc
 -->
 
 <!-- DOCS-SITE-LINK:START automatically generated  -->
+
 ### [Read this on the main serverless docs site](https://www.serverless.com/framework/docs/providers/aws/examples/hello-world/csharp/)
+
 <!-- DOCS-SITE-LINK:END -->
 
 # Hello World C# Example
@@ -15,7 +17,7 @@ Make sure `serverless` is installed. [See installation guide](../../../guide/ins
 
 Once installed the Serverless CLI can be called with `serverless` or the shorthand `sls` command.
 
-If `sls` command retuns an error in PowerShell, please user `serverless` command.
+If `sls` command returns an error in PowerShell, please use `serverless` command.
 
 ```
 $ sls
@@ -56,7 +58,6 @@ sls deploy
 ```
 
 This will deploy your function to AWS Lambda based on the settings in `serverless.yml`.
-
 
 ## 4. Invoke deployed function
 
